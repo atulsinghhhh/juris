@@ -1,0 +1,56 @@
+// Prisma schema — for future Next.js direct DB access
+// The FastAPI backend uses SQLAlchemy against the same PostgreSQL instance.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Firm {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  email     String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+
+  documents Document[]
+
+  @@map("firms")
+}
+
+model Document {
+  id           String    @id @default(uuid()) @db.Uuid
+  firmId       String    @map("firm_id") @db.Uuid
+  filename     String
+  filePath     String    @map("file_path")
+  status       String    @default("processing")
+  overallRisk  String?   @map("overall_risk")
+  summary      String?
+  errorMessage String?   @map("error_message")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  completedAt  DateTime? @map("completed_at")
+
+  firm    Firm     @relation(fields: [firmId], references: [id])
+  clauses Clause[]
+
+  @@map("documents")
+}
+
+model Clause {
+  id              String   @id @default(uuid()) @db.Uuid
+  documentId      String   @map("document_id") @db.Uuid
+  firmId          String   @map("firm_id") @db.Uuid
+  clauseType      String   @map("clause_type")
+  riskLevel       String   @map("risk_level")
+  originalText    String   @map("original_text")
+  reason          String
+  suggestedRedline String  @map("suggested_redline")
+  position        Int      @default(0)
+
+  document Document @relation(fields: [documentId], references: [id])
+
+  @@map("clauses")
+}
