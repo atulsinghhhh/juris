@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
+import { getSession } from "@/app/lib/session";
+import { logout } from "@/app/actions/auth";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -18,11 +20,13 @@ export const metadata: Metadata = {
   description: "AI-powered contract review for law firms",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await getSession();
+
   return (
     <html
       lang="en"
@@ -41,14 +45,43 @@ export default function RootLayout({
               <span className="font-bold text-slate-900 tracking-tight">Juris</span>
               <span className="hidden sm:inline text-xs font-medium text-indigo-600 bg-indigo-50 border border-indigo-100 px-2 py-0.5 rounded-full">Beta</span>
             </Link>
+
             <nav className="flex items-center gap-1">
-              <span className="text-xs text-slate-500 hidden sm:block mr-2">Powered by Claude AI</span>
               <Link
-                href="/"
+                href="/pricing"
                 className="text-sm font-medium text-slate-600 hover:text-slate-900 px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-colors"
               >
-                New Review
+                Pricing
               </Link>
+
+              {session ? (
+                <>
+                  <span className="hidden sm:block text-xs text-slate-400 mx-2">{session.email}</span>
+                  <form action={logout}>
+                    <button
+                      type="submit"
+                      className="text-sm font-medium text-slate-600 hover:text-slate-900 px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-colors"
+                    >
+                      Sign out
+                    </button>
+                  </form>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    className="text-sm font-medium text-slate-600 hover:text-slate-900 px-3 py-1.5 rounded-lg hover:bg-slate-100 transition-colors"
+                  >
+                    Sign in
+                  </Link>
+                  <Link
+                    href="/signup"
+                    className="text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 px-3.5 py-1.5 rounded-lg transition-colors shadow-sm"
+                  >
+                    Get started
+                  </Link>
+                </>
+              )}
             </nav>
           </div>
         </header>
@@ -60,7 +93,11 @@ export default function RootLayout({
         {/* Footer */}
         <footer className="border-t border-slate-100 py-6 px-6">
           <div className="mx-auto max-w-6xl flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-400">
-            <span>© 2026 Juris. AI-powered contract analysis.</span>
+            <div className="flex items-center gap-4">
+              <span>© 2026 Juris</span>
+              <Link href="/pricing" className="hover:text-slate-600">Pricing</Link>
+              <Link href="/login" className="hover:text-slate-600">Sign in</Link>
+            </div>
             <span>Files are encrypted in transit and never shared.</span>
           </div>
         </footer>
