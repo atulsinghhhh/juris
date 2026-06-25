@@ -1,9 +1,10 @@
 import io
+from typing import Optional
 from minio import Minio
 from minio.error import S3Error
 from ..config import settings
 
-_client: Minio | None = None
+_client: Optional[Minio] = None
 
 
 def get_client() -> Minio:

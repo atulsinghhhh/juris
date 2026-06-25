@@ -73,20 +73,20 @@ export function UploadZone() {
   const isUploading = state === "uploading";
 
   return (
-    <div className="w-full max-w-xl mx-auto">
+    <div className="w-full">
       <div
         onDragOver={(e) => { e.preventDefault(); setState("dragging"); }}
         onDragLeave={() => setState("idle")}
         onDrop={onDrop}
         onClick={() => !isUploading && inputRef.current?.click()}
-        className={`
-          relative flex flex-col items-center justify-center gap-4
-          rounded-2xl border-2 border-dashed px-8 py-16 transition-all cursor-pointer
-          ${state === "dragging" ? "border-indigo-500 bg-indigo-50" : ""}
-          ${state === "error" ? "border-red-300 bg-red-50" : ""}
-          ${state === "idle" ? "border-gray-300 bg-gray-50 hover:border-indigo-400 hover:bg-indigo-50/40" : ""}
-          ${isUploading ? "border-indigo-300 bg-indigo-50 cursor-not-allowed" : ""}
-        `}
+        className={[
+          "relative flex flex-col items-center justify-center gap-4 rounded-2xl border-2 border-dashed px-8 py-14 transition-all",
+          isUploading ? "cursor-not-allowed" : "cursor-pointer",
+          state === "dragging" ? "border-indigo-400 bg-indigo-50" : "",
+          state === "error" ? "border-red-300 bg-red-50/60" : "",
+          state === "idle" ? "border-slate-300 bg-slate-50 hover:border-indigo-400 hover:bg-indigo-50/40" : "",
+          isUploading ? "border-indigo-300 bg-indigo-50/60" : "",
+        ].join(" ")}
       >
         <input
           ref={inputRef}
@@ -99,15 +99,15 @@ export function UploadZone() {
 
         {isUploading ? (
           <>
-            <div className="w-12 h-12 rounded-full border-4 border-indigo-200 border-t-indigo-600 animate-spin" />
+            <div className="w-11 h-11 rounded-full border-4 border-indigo-100 border-t-indigo-600 animate-spin" />
             <div className="text-center">
-              <p className="font-semibold text-indigo-700">{progress}</p>
-              <p className="text-sm text-gray-500 mt-1">This usually takes 20–40 seconds</p>
+              <p className="font-semibold text-slate-900">{progress}</p>
+              <p className="text-sm text-slate-500 mt-1">This usually takes 20–40 seconds</p>
             </div>
           </>
         ) : (
           <>
-            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${state === "error" ? "bg-red-100" : "bg-indigo-100"}`}>
+            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm ${state === "error" ? "bg-red-100" : "bg-white border border-slate-200"}`}>
               {state === "error" ? (
                 <svg className="w-7 h-7 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
@@ -120,15 +120,34 @@ export function UploadZone() {
             </div>
 
             <div className="text-center">
-              <p className="font-semibold text-gray-800">
+              <p className="font-semibold text-slate-900">
                 {state === "dragging" ? "Drop your contract here" : "Upload your contract"}
               </p>
-              <p className="text-sm text-gray-500 mt-1">Drag & drop or click to browse</p>
-              <p className="text-xs text-gray-400 mt-0.5">PDF or DOCX · Max 50 MB</p>
+              <p className="text-sm text-slate-500 mt-1">
+                {state === "error" ? "" : "Drag & drop or click to browse"}
+              </p>
+              {!error && (
+                <p className="text-xs text-slate-400 mt-0.5">PDF or DOCX · Max 50 MB</p>
+              )}
             </div>
 
             {state === "error" && error && (
-              <p className="text-sm text-red-600 font-medium text-center">{error}</p>
+              <div className="flex items-center gap-2 text-sm text-red-600 font-medium bg-red-50 border border-red-200 rounded-lg px-4 py-2.5">
+                <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                {error}
+              </div>
+            )}
+
+            {state !== "error" && (
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); inputRef.current?.click(); }}
+                className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-sm font-semibold rounded-lg shadow-sm transition-colors"
+              >
+                Choose file
+              </button>
             )}
           </>
         )}

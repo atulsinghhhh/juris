@@ -7,7 +7,17 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid()) @db.Uuid
+  name         String
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  plan         String   @default("starter")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@map("users")
 }
 
 model Firm {

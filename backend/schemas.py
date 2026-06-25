@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime
+from typing import List, Optional
 from pydantic import BaseModel
 
 
@@ -20,12 +21,12 @@ class DocumentOut(BaseModel):
     firm_id: uuid.UUID
     filename: str
     status: str
-    overall_risk: str | None
-    summary: str | None
-    error_message: str | None
+    overall_risk: Optional[str]
+    summary: Optional[str]
+    error_message: Optional[str]
     created_at: datetime
-    completed_at: datetime | None
-    clauses: list[ClauseOut] = []
+    completed_at: Optional[datetime]
+    clauses: List[ClauseOut] = []
 
     model_config = {"from_attributes": True}
 
@@ -46,4 +47,4 @@ class ClauseAnalysis(BaseModel):
 class ContractAnalysis(BaseModel):
     summary: str
     overall_risk: str
-    clauses: list[ClauseAnalysis]
+    clauses: List[ClauseAnalysis]
